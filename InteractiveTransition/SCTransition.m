@@ -19,6 +19,7 @@
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
+    NSLog(@"Are we no longer calling this");
     //Get references to the view hierarchy
     UIView *containerView = [transitionContext containerView];
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -50,7 +51,7 @@
         UIView *view = [toViewController valueForKeyPath:@"squareView"];
         
         if (USECA)
-            [self animateLayer:view.layer withCompletion:^{ [transitionContext completeTransition:YES]; }];
+            [self animateLayer:view.layer withCompletion:^{ NSLog(@"completion");[transitionContext completeTransition:YES]; }];
         else
         [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
             view.layer.transform = CATransform3DIdentity;
@@ -83,20 +84,20 @@
 }
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 1.0;
+    return 2.0;
 }
 - (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
     _transitionContext = transitionContext;
-    [super startInteractiveTransition:transitionContext];
+    [self animateTransition:_transitionContext];
+    UIView *view = [self.toViewController valueForKeyPath:@"squareView"];
+    view.layer.speed = 0.0;
 }
 - (void)updateInteractiveTransition:(CGFloat)percentComplete {
-    self.toViewController.view.layer.timeOffset = percentComplete;
+    UIView *view = [self.toViewController valueForKeyPath:@"squareView"];
+    view.layer.timeOffset = percentComplete;
     NSLog(@"%f",percentComplete);
 }
-- (void)finishInteractiveTransition {
-    [super finishInteractiveTransition];
-    
-}
+
 
 - (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
     CGFloat progress = [recognizer translationInView:recognizer.view].x / (recognizer.view.bounds.size.width * 1.0);
@@ -107,15 +108,21 @@
             [self updateInteractiveTransition:progress];
             break;
         case UIGestureRecognizerStateCancelled:
-        case UIGestureRecognizerStateEnded:
+        case UIGestureRecognizerStateEnded:{
+            UIView *view = [self.toViewController valueForKeyPath:@"squareView"];
+            view.layer.timeOffset = [view.layer convertTime:progress toLayer:view.layer];
+            view.layer.beginTime = CACurrentMediaTime();
+            view.layer.speed = 1.0;
+
             if (progress < 0.5){
-                [self cancelInteractiveTransition];
+                //[_transitionContext completeTransition:NO];
             }else{
-                [self finishInteractiveTransition];
+                //[_transitionContext completeTransition:YES];
                 [recognizer.view removeGestureRecognizer:recognizer];
             }
             self.shouldBeginInteractiveTransition = NO;
             break;
+        }
         default:
             break;
     }

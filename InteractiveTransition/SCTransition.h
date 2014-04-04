@@ -22,7 +22,7 @@ typedef NS_ENUM(NSUInteger, SCCardTranstionDirection) {
 
 #define USECA YES
 
-@interface SCTransition : UIPercentDrivenInteractiveTransition <UIViewControllerAnimatedTransitioning>
+@interface SCTransition : NSObject <UIViewControllerAnimatedTransitioning, UIViewControllerInteractiveTransitioning>
 
 @property (nonatomic) SCCardTranstionDirection transitionDirection;
 
