@@ -24,21 +24,23 @@
     pop.edges = UIRectEdgeLeft;
     [self.view addGestureRecognizer:pop];
 }
-- (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
-    self.transition.shouldBeginInteractiveTransition = YES;
-    if (recognizer.state == UIGestureRecognizerStateBegan) {
-        [self.navigationController popViewControllerAnimated:YES];
-    }
-    [self.transition handleGesture:recognizer];
-}
 
 #pragma mark - Navigation controller delegate
 
 - (id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC {
     return (operation == UINavigationControllerOperationPop) ? self.transition : nil;
 }
+
 - (id<UIViewControllerInteractiveTransitioning>)navigationController:(UINavigationController *)navigationController interactionControllerForAnimationController:(id<UIViewControllerAnimatedTransitioning>)animationController{
     return (self.transition.shouldBeginInteractiveTransition) ? self.transition : nil;
+}
+
+- (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
+    self.transition.shouldBeginInteractiveTransition = YES;
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+    [self.transition handleGesture:recognizer];
 }
 
 - (SCTransition *)transition {

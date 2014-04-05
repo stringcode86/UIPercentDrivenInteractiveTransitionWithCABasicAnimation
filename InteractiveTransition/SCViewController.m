@@ -11,6 +11,7 @@
 
 @interface SCViewController () <UINavigationControllerDelegate>
 @property (weak, nonatomic) IBOutlet UIView *squareView;
+@property (nonatomic) SCTransition *transition;
 @end
 
 @implementation SCViewController
@@ -21,6 +22,10 @@
     CATransform3D transfrom = CATransform3DIdentity;
     transfrom.m34 = -1.f/500.f;
     self.view.layer.sublayerTransform = transfrom;
+    
+    UIScreenEdgePanGestureRecognizer *pop = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
+    pop.edges = UIRectEdgeRight;
+    [self.view addGestureRecognizer:pop];
 }
 
 - (void)animateLayer:(CALayer *)layer withCompletion:(void(^)())block {
@@ -41,6 +46,25 @@
 
 - (id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC {
     return (operation == UINavigationControllerOperationPush) ? [[SCTransition alloc] init] : nil;
+}
+- (id<UIViewControllerInteractiveTransitioning>)navigationController:(UINavigationController *)navigationController interactionControllerForAnimationController:(id<UIViewControllerAnimatedTransitioning>)animationController{
+    return (self.transition.shouldBeginInteractiveTransition) ? self.transition : nil;
+}
+
+- (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
+    self.transition.shouldBeginInteractiveTransition = YES;
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
+        [self performSegueWithIdentifier:@"toSecond" sender:self];
+    }
+    [self.transition handleGesture:recognizer];
+}
+
+- (SCTransition *)transition {
+    if (!_transition) {
+        _transition = [[SCTransition alloc] init];
+        _transition.transitionDirection = kSCTransitionForwards;
+    }
+    return _transition;
 }
 
 

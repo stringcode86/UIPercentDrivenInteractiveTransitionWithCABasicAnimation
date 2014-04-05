@@ -37,7 +37,7 @@
                     <navigationItem key="navigationItem" title="1" id="HB4-w5-KO0">
                         <barButtonItem key="rightBarButtonItem" title="Push" id="eWv-7b-3d8">
                             <connections>
-                                <segue destination="SXJ-bc-eYG" kind="push" id="z41-c8-Wi4"/>
+                                <segue destination="SXJ-bc-eYG" kind="push" identifier="toSecond" id="z41-c8-Wi4"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

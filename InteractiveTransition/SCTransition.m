@@ -22,16 +22,17 @@
     
     if (self.transitionDirection == kSCTransitionForwards) {
         UIView *view = [fromViewController valueForKeyPath:@"squareView"];
+        
+        [containerView insertSubview:toViewController.view atIndex:0];
         [self animateLayer:view.layer withCompletion:^{
-            [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
-            [transitionContext completeTransition:YES];
+            
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
         
     } else if (self.transitionDirection == kSCTransitionBackwards) {
         
         [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
         UIView *view = [toViewController valueForKeyPath:@"squareView"];
-        fromViewController.view.alpha = 0.5;
             [self animateLayer:view.layer withCompletion:^{
                 if ([transitionContext transitionWasCancelled]) {
                     [containerView addSubview:fromViewController.view];
@@ -39,7 +40,6 @@
                     [toViewController.view removeFromSuperview];
                 }
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-                NSLog(@"trasition");
             }];
     }
 }

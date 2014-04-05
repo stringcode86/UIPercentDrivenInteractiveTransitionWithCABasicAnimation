@@ -44,11 +44,9 @@
     CALayer *containerLayer =[_transitionContext containerView].layer;
     containerLayer.speed = -1.0;
     containerLayer.beginTime = CACurrentMediaTime();
-    NSLog(@"%f %f",self.completionSpeed, [self transitionDuration:_transitionContext]);
     CGFloat delay = ((1.0-self.completionSpeed)*[self transitionDuration:_transitionContext])+0.05;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         containerLayer.speed = 1.0;
-        NSLog(@"speed");
     });
 }
 
@@ -59,8 +57,9 @@
 
 - (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
     CGFloat progress = [recognizer translationInView:recognizer.view].x / (recognizer.view.bounds.size.width * 1.0);
+    progress = fabsf(progress);
     progress = MIN(1.0, MAX(0.0, progress));
-    
+
     switch (recognizer.state) {
         case UIGestureRecognizerStateBegan:
             break;
