@@ -34,27 +34,19 @@
     self.containerView = containerView;
     
     if (self.transitionDirection == kSCCardTransitionForwards) {
-
-        [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
-        toViewController.view.transform = CGAffineTransformMakeTranslation(0.0, toViewController.view.bounds.size.height);
-        [UIView animateWithDuration:[self transitionDuration:transitionContext]
-                         animations:^{
-                             toViewController.view.transform = CGAffineTransformIdentity;
-                         }
-                         completion:^(BOOL finished) {
-                             [transitionContext completeTransition:YES];
-                         }];
+        UIView *view = [fromViewController valueForKeyPath:@"squareView"];
+        [self animateLayer:view.layer withCompletion:^{
+            [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
+            [fromViewController.view removeFromSuperview];
+            [transitionContext completeTransition:YES];
+        }];
 
     } else if (self.transitionDirection == kSCCardTransitionBackwards) {
-        [containerView insertSubview:toViewController.view belowSubview:fromViewController.view];
-        [UIView animateWithDuration:[self transitionDuration:transitionContext]
-                         animations:^{
-                             fromViewController.view.transform = CGAffineTransformMakeTranslation(0.0, fromViewController.view.bounds.size.height);
-                         }
-                         completion:^(BOOL finished) {
-                             NSLog(@"completed");
-                            [_transitionContext completeTransition:YES];
-                         }];
+        
+        [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
+        [fromViewController.view removeFromSuperview];
+        UIView *view = [toViewController valueForKeyPath:@"squareView"];
+        [self animateLayer:view.layer withCompletion:^{ [transitionContext completeTransition:YES]; }];
     }
 }
 
