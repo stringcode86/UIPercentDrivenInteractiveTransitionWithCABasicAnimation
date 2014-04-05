@@ -16,6 +16,7 @@
 
 @implementation SCTransition {
     __weak id <UIViewControllerContextTransitioning> _transitionContext;
+    CGFloat _pausedTime;
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
@@ -61,7 +62,65 @@
     }
 }
 
+- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
+    return 1.0;
+}
+- (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
+    [super startInteractiveTransition:transitionContext];
+    _transitionContext = transitionContext;
+    [self pauseLayer:[transitionContext containerView].layer];
+}
+- (void)updateInteractiveTransition:(CGFloat)percentComplete {
+    [super updateInteractiveTransition:percentComplete];
+    [_transitionContext containerView].layer.timeOffset = percentComplete;
 
+}
+- (void)finishInteractiveTransition {
+    [super finishInteractiveTransition];
+    [self resumeLayer:[_transitionContext containerView].layer];
+}
+
+- (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
+    CGFloat progress = [recognizer translationInView:recognizer.view].x / (recognizer.view.bounds.size.width * 1.0);
+    progress = MIN(1.0, MAX(0.0, progress));
+    
+    switch (recognizer.state) {
+        case UIGestureRecognizerStateChanged:
+            [self updateInteractiveTransition:progress];
+            break;
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateEnded:
+            if (progress < 0.5){
+                [self cancelInteractiveTransition];
+            }else{
+                
+                [self finishInteractiveTransition];
+                [recognizer.view removeGestureRecognizer:recognizer];
+            }
+            self.shouldBeginInteractiveTransition = NO;
+            break;
+        default:
+            break;
+    }
+}
+
+-(void)pauseLayer:(CALayer*)layer
+{
+    CFTimeInterval pausedTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil];
+    layer.speed = 0.0;
+    layer.timeOffset = pausedTime;
+    _pausedTime = pausedTime;
+}
+
+-(void)resumeLayer:(CALayer*)layer
+{
+    CFTimeInterval pausedTime = [layer timeOffset];
+    layer.speed = 1.0;
+    layer.timeOffset = 0.0;
+    layer.beginTime = 0.0;
+    CFTimeInterval timeSincePause = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
+    layer.beginTime = timeSincePause;
+}
 - (void)animateLayer:(CALayer *)layer withCompletion:(void(^)())block {
     
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.y"];
@@ -82,42 +141,4 @@
     }
 }
 
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 1.0;
-}
-- (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
-    _transitionContext = transitionContext;
-    [super startInteractiveTransition:transitionContext];
-}
-- (void)updateInteractiveTransition:(CGFloat)percentComplete {
-    self.toViewController.view.layer.timeOffset = percentComplete;
-    NSLog(@"%f",percentComplete);
-}
-- (void)finishInteractiveTransition {
-    [super finishInteractiveTransition];
-    
-}
-
-- (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
-    CGFloat progress = [recognizer translationInView:recognizer.view].x / (recognizer.view.bounds.size.width * 1.0);
-    progress = MIN(1.0, MAX(0.0, progress));
-    
-    switch (recognizer.state) {
-        case UIGestureRecognizerStateChanged:
-            [self updateInteractiveTransition:progress];
-            break;
-        case UIGestureRecognizerStateCancelled:
-        case UIGestureRecognizerStateEnded:
-            if (progress < 0.5){
-                [self cancelInteractiveTransition];
-            }else{
-                [self finishInteractiveTransition];
-                [recognizer.view removeGestureRecognizer:recognizer];
-            }
-            self.shouldBeginInteractiveTransition = NO;
-            break;
-        default:
-            break;
-    }
-}
 @end
