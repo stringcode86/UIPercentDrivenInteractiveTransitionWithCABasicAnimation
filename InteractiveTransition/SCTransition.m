@@ -10,8 +10,6 @@
 
 
 @interface SCTransition ()
-@property (nonatomic, weak) UIViewController *fromViewController;
-@property (nonatomic, weak) UIViewController *toViewController;
 @end
 
 @implementation SCTransition {
@@ -20,14 +18,10 @@
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
-    //Get references to the view hierarchy
+
     UIView *containerView = [transitionContext containerView];
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-    
-    self.fromViewController = fromViewController;
-    self.toViewController = toViewController;
-    
     
     if (self.transitionDirection == kSCCardTransitionForwards) {
         UIView *view = [fromViewController valueForKeyPath:@"squareView"];
@@ -65,19 +59,17 @@
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
     return 1.0;
 }
+
 - (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
     [super startInteractiveTransition:transitionContext];
     _transitionContext = transitionContext;
-    [self pauseLayer:[transitionContext containerView].layer];
 }
-- (void)updateInteractiveTransition:(CGFloat)percentComplete {
-    [super updateInteractiveTransition:percentComplete];
-    [_transitionContext containerView].layer.timeOffset = percentComplete;
 
-}
 - (void)finishInteractiveTransition {
     [super finishInteractiveTransition];
-    [self resumeLayer:[_transitionContext containerView].layer];
+    CALayer *layer = [_transitionContext containerView].layer;
+    layer.speed = 1.0;
+    layer.beginTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - layer.timeOffset;
 }
 
 - (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
@@ -93,7 +85,7 @@
             if (progress < 0.5){
                 [self cancelInteractiveTransition];
             }else{
-                
+                self.completionSpeed =  [self transitionDuration:_transitionContext]*progress;
                 [self finishInteractiveTransition];
                 [recognizer.view removeGestureRecognizer:recognizer];
             }
@@ -102,24 +94,6 @@
         default:
             break;
     }
-}
-
--(void)pauseLayer:(CALayer*)layer
-{
-    CFTimeInterval pausedTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil];
-    layer.speed = 0.0;
-    layer.timeOffset = pausedTime;
-    _pausedTime = pausedTime;
-}
-
--(void)resumeLayer:(CALayer*)layer
-{
-    CFTimeInterval pausedTime = [layer timeOffset];
-    layer.speed = 1.0;
-    layer.timeOffset = 0.0;
-    layer.beginTime = 0.0;
-    CFTimeInterval timeSincePause = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
-    layer.beginTime = timeSincePause;
 }
 - (void)animateLayer:(CALayer *)layer withCompletion:(void(^)())block {
     
