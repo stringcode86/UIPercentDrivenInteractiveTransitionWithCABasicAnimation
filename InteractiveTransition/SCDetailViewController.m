@@ -32,9 +32,6 @@
     [self.transition handleGesture:recognizer];
 }
 
-- (void)dealloc {
-}
-
 #pragma mark - Navigation controller delegate
 
 - (id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC {

@@ -96,7 +96,6 @@
             }else{
                 self.completionSpeed = progress;
                 [self finishInteractiveTransition];
-                [recognizer.view removeGestureRecognizer:recognizer];
             }
             self.shouldBeginInteractiveTransition = NO;
             break;
