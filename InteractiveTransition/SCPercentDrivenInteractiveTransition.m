@@ -21,7 +21,7 @@
 }
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return self.transitionDirection==kSCTransitionForwards ? 1.0 : 2.0;
+    return 1.0;
 }
 
 - (CGFloat)completionSpeed {
@@ -44,6 +44,12 @@
     CALayer *containerLayer =[_transitionContext containerView].layer;
     containerLayer.speed = -1.0;
     containerLayer.beginTime = CACurrentMediaTime();
+    NSLog(@"%f %f",self.completionSpeed, [self transitionDuration:_transitionContext]);
+    CGFloat delay = ((1.0-self.completionSpeed)*[self transitionDuration:_transitionContext])+0.05;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        containerLayer.speed = 1.0;
+        NSLog(@"speed");
+    });
 }
 
 - (void)finishInteractiveTransition {

@@ -39,10 +39,10 @@
                     [toViewController.view removeFromSuperview];
                 }
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                NSLog(@"trasition");
             }];
     }
 }
-
 
 - (void)animateLayer:(CALayer *)layer withCompletion:(void(^)())block {
     
