@@ -21,7 +21,22 @@
     CATransform3D transfrom = CATransform3DIdentity;
     transfrom.m34 = -1.f/500.f;
     self.view.layer.sublayerTransform = transfrom;
+    NSLog(@"one appered");
 }
+
+- (void)animateLayer:(CALayer *)layer withCompletion:(void(^)())block {
+    
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.y"];
+    animation.fromValue = @0.0;
+    animation.toValue = [NSNumber numberWithFloat:M_PI];
+    animation.duration = 2.0;
+    animation.fillMode = kCAFillModeBoth;
+    animation.removedOnCompletion = NO;
+    animation.delegate = self;
+    [animation setValue:block forKeyPath:@"block"];
+    [layer addAnimation:animation forKey:@"transform.rotation.y"];
+}
+
 
 #pragma mark - Navigation controller delegate
 

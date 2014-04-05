@@ -20,7 +20,7 @@ typedef NS_ENUM(NSUInteger, SCCardTranstionDirection) {
 // transition. CA animations arent WHY ?! and how to make them animate smoothly
 
 
-#define USECA YES
+#define USECA NO
 
 @interface SCTransition : NSObject <UIViewControllerAnimatedTransitioning, UIViewControllerInteractiveTransitioning>
 

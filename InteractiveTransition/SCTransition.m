@@ -12,6 +12,8 @@
 @interface SCTransition ()
 @property (nonatomic, weak) UIViewController *fromViewController;
 @property (nonatomic, weak) UIViewController *toViewController;
+@property (nonatomic ) CGFloat completionSpeed;
+@property UIViewAnimationCurve completionCurve;
 @end
 
 @implementation SCTransition {
@@ -51,11 +53,15 @@
         UIView *view = [toViewController valueForKeyPath:@"squareView"];
         
         if (USECA)
-            [self animateLayer:view.layer withCompletion:^{ NSLog(@"completion");[transitionContext completeTransition:YES]; }];
+            [self animateLayer:view.layer withCompletion:^{
+                NSLog(@"completion");
+                [transitionContext completeTransition:YES];
+            }];
         else
         [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
             view.layer.transform = CATransform3DIdentity;
         } completion:^(BOOL finished) {
+            NSLog(@"completion");
             [transitionContext completeTransition:YES];
         }];
 
@@ -89,12 +95,12 @@
 - (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
     _transitionContext = transitionContext;
     [self animateTransition:_transitionContext];
-    UIView *view = [self.toViewController valueForKeyPath:@"squareView"];
-    view.layer.speed = 0.0;
+//    UIView *view = [self.toViewController valueForKeyPath:@"squareView"];
+//    view.layer.speed = 0.0;
 }
 - (void)updateInteractiveTransition:(CGFloat)percentComplete {
-    UIView *view = [self.toViewController valueForKeyPath:@"squareView"];
-    view.layer.timeOffset = percentComplete;
+//    UIView *view = [self.toViewController valueForKeyPath:@"squareView"];
+//    view.layer.timeOffset = percentComplete;
     NSLog(@"%f",percentComplete);
 }
 
@@ -118,7 +124,13 @@
                 //[_transitionContext completeTransition:NO];
             }else{
                 //[_transitionContext completeTransition:YES];
+                //UIView *view = [self.toViewController valueForKeyPath:@"squareView"];
+                //view.layer.speed = 1.0;
+                //view.layer.beginTime = [view.layer convertTime:CACurrentMediaTime() fromLayer:nil];
                 [recognizer.view removeGestureRecognizer:recognizer];
+                self.completionSpeed = 1.0;
+                self.completionCurve = UIViewAnimationCurveEaseInOut;
+                
             }
             self.shouldBeginInteractiveTransition = NO;
             break;
