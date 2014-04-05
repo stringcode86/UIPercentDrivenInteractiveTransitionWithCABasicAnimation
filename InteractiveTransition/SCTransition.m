@@ -15,10 +15,10 @@
 @implementation SCTransition {
     __weak id <UIViewControllerContextTransitioning> _transitionContext;
     CGFloat _pausedTime;
+    BOOL _wasCanceled;
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
-
     UIView *containerView = [transitionContext containerView];
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
@@ -43,9 +43,13 @@
         [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
         [fromViewController.view removeFromSuperview];
         UIView *view = [toViewController valueForKeyPath:@"squareView"];
-        
+        fromViewController.view.alpha = 0.5;
         if (USECA)
-            [self animateLayer:view.layer withCompletion:^{ [transitionContext completeTransition:YES]; }];
+            [self animateLayer:view.layer withCompletion:^{
+                if (_wasCanceled) [containerView addSubview:fromViewController.view];
+                [transitionContext completeTransition:!_wasCanceled];
+                _wasCanceled = NO;
+            }];
         else
         [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
             view.layer.transform = CATransform3DIdentity;
@@ -72,6 +76,14 @@
     layer.beginTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - layer.timeOffset;
 }
 
+- (void)cancelInteractiveTransition {
+    _wasCanceled = YES;
+    [super cancelInteractiveTransition];
+    CALayer *layer = [_transitionContext containerView].layer;
+    layer.speed = -1.0;
+    layer.beginTime = CACurrentMediaTime();
+}
+
 - (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
     CGFloat progress = [recognizer translationInView:recognizer.view].x / (recognizer.view.bounds.size.width * 1.0);
     progress = MIN(1.0, MAX(0.0, progress));
@@ -83,9 +95,10 @@
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateEnded:
             if (progress < 0.5){
+                self.completionSpeed = [self transitionDuration:_transitionContext]*(1.0 - progress);
                 [self cancelInteractiveTransition];
             }else{
-                self.completionSpeed =  [self transitionDuration:_transitionContext]*progress;
+                self.completionSpeed = [self transitionDuration:_transitionContext]*progress;
                 [self finishInteractiveTransition];
                 [recognizer.view removeGestureRecognizer:recognizer];
             }
