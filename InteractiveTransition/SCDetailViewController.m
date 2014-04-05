@@ -11,6 +11,7 @@
 
 @interface SCDetailViewController () <UINavigationControllerDelegate>
 @property (nonatomic, strong) SCTransition *transition;
+
 @end
 
 @implementation SCDetailViewController
@@ -30,6 +31,7 @@
     }
     [self.transition handleGesture:recognizer];
 }
+
 #pragma mark - Navigation controller delegate
 
 - (id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC {
@@ -42,7 +44,7 @@
 - (SCTransition *)transition {
     if (!_transition) {
         _transition = [[SCTransition alloc] init];
-        _transition.transitionDirection = kSCCardTransitionBackwards;
+        _transition.transitionDirection = kSCTransitionBackwards;
     }
     return _transition;
 }
