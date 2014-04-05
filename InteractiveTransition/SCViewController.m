@@ -21,11 +21,6 @@
     CATransform3D transfrom = CATransform3DIdentity;
     transfrom.m34 = -1.f/500.f;
     self.view.layer.sublayerTransform = transfrom;
-    NSLog(@"%@",self.navigationController.viewControllers);
-
-}
-- (IBAction)buttonPressed:(id)sender {
-    NSLog(@"buttonPressed");
 }
 
 - (void)animateLayer:(CALayer *)layer withCompletion:(void(^)())block {

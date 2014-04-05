@@ -11,10 +11,10 @@
 
 @interface SCTransition ()
 @property (nonatomic) CGFloat completionSpeed;
+@property (nonatomic, weak) id <UIViewControllerContextTransitioning> transitionContext;
 @end
 
 @implementation SCTransition {
-    __weak id <UIViewControllerContextTransitioning> _transitionContext;
     CGFloat _pausedTime;
     BOOL _wasCanceled;
 }
@@ -30,70 +30,79 @@
         [self animateLayer:view.layer withCompletion:^{
             [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
             [transitionContext completeTransition:YES];
+
         }];
 
     } else if (self.transitionDirection == kSCCardTransitionBackwards) {
         
         [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
-        [fromViewController.view removeFromSuperview];
+        fromViewController.view.alpha = 0.0;
         UIView *view = [toViewController valueForKeyPath:@"squareView"];
         [self animateLayer:view.layer withCompletion:^{
-            NSLog(@"complete %@", _wasCanceled ? @"caneled" : @"finished");
-            [transitionContext completeTransition:!_wasCanceled];
+            NSLog(@"completed %@", _wasCanceled ? @"canceled" : @"finished");
             if (_wasCanceled) {
-                [containerView addSubview:fromViewController.view];
+                fromViewController.view.alpha = 1.0;
+            }else {
                 [fromViewController.view removeFromSuperview];
             }
+            [transitionContext completeTransition:!_wasCanceled];
+            _wasCanceled = NO;
         }];
     }
 }
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 1.0;
+    return (self.transitionDirection == kSCCardTransitionForwards) ? 0.5 : 5.0;
 }
 
 - (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
     _transitionContext = transitionContext;
     [self animateTransition:_transitionContext];
     [self pauseLayer:[transitionContext containerView].layer];
+    NSLog(@"boom");
 
 }
 
 - (void)updateInteractiveTransition:(CGFloat)percentComplete {
-    [_transitionContext containerView].layer.timeOffset =  _pausedTime + [self transitionDuration:_transitionContext]*percentComplete;
     [_transitionContext updateInteractiveTransition:percentComplete];
+    [_transitionContext containerView].layer.timeOffset =  _pausedTime + [self transitionDuration:_transitionContext]*percentComplete;
 }
 
 - (void)cancelInteractiveTransition {
     _wasCanceled = YES;
     CALayer *containerLayer =[_transitionContext containerView].layer;
-    self.completionSpeed = (containerLayer.timeOffset - _pausedTime);
+    CALayer *layer = containerLayer;
+
+    
+    [self resumeLayer:layer];
     [_transitionContext cancelInteractiveTransition];
-    [self resumeLayer:containerLayer];
-    containerLayer.speed = 1.0;
 }
 
 - (void)finishInteractiveTransition {
     _wasCanceled = NO;
-    self.completionSpeed = [_transitionContext containerView].layer.timeOffset - _pausedTime;
-    [_transitionContext finishInteractiveTransition];
     [self resumeLayer:[_transitionContext containerView].layer];
+    [_transitionContext finishInteractiveTransition];
 }
+
 
 - (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
     CGFloat progress = [recognizer translationInView:recognizer.view].x / (recognizer.view.bounds.size.width * 1.0);
     progress = MIN(1.0, MAX(0.0, progress));
     
     switch (recognizer.state) {
+        case UIGestureRecognizerStateBegan:
+            break;
         case UIGestureRecognizerStateChanged:
             [self updateInteractiveTransition:progress];
             break;
-        case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateEnded:{
             if (progress < 0.5){
+                self.completionSpeed = progress;//(1.0-progress);
                 [self cancelInteractiveTransition];
             }else{
+                self.completionSpeed = progress;
                 [self finishInteractiveTransition];
+                [recognizer.view removeGestureRecognizer:recognizer];
             }
             self.shouldBeginInteractiveTransition = NO;
             break;
@@ -126,7 +135,7 @@
     animation.toValue = [NSNumber numberWithFloat:M_PI];
     animation.duration = [self transitionDuration:_transitionContext];
     animation.fillMode = kCAFillModeBoth;
-    animation.removedOnCompletion = NO;
+    animation.removedOnCompletion = YES;
     animation.delegate = self;
     [animation setValue:block forKeyPath:@"block"];
     [layer addAnimation:animation forKey:@"transform.rotation.y"];

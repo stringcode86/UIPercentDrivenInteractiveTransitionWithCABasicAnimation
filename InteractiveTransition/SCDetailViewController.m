@@ -11,6 +11,7 @@
 
 @interface SCDetailViewController () <UINavigationControllerDelegate>
 @property (nonatomic, strong) SCTransition *transition;
+
 @end
 
 @implementation SCDetailViewController
@@ -30,6 +31,11 @@
     }
     [self.transition handleGesture:recognizer];
 }
+
+- (void)dealloc {
+    NSLog(@"dealloc");
+}
+
 #pragma mark - Navigation controller delegate
 
 - (id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC {
