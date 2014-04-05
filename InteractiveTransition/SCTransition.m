@@ -30,24 +30,22 @@
         [self animateLayer:view.layer withCompletion:^{
             [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
             [transitionContext completeTransition:YES];
-
         }];
-
+        
     } else if (self.transitionDirection == kSCCardTransitionBackwards) {
         
         [containerView insertSubview:toViewController.view aboveSubview:fromViewController.view];
-        fromViewController.view.alpha = 0.0;
         UIView *view = [toViewController valueForKeyPath:@"squareView"];
-        [self animateLayer:view.layer withCompletion:^{
-            NSLog(@"completed %@", _wasCanceled ? @"canceled" : @"finished");
-            if (_wasCanceled) {
-                fromViewController.view.alpha = 1.0;
-            }else {
-                [fromViewController.view removeFromSuperview];
-            }
-            [transitionContext completeTransition:!_wasCanceled];
-            _wasCanceled = NO;
-        }];
+        fromViewController.view.alpha = 0.5;
+            [self animateLayer:view.layer withCompletion:^{
+                if (_wasCanceled) {
+                    [containerView addSubview:fromViewController.view];
+                    fromViewController.view.alpha = 1.0;
+                    [toViewController.view removeFromSuperview];
+                }
+                [transitionContext completeTransition:!_wasCanceled];
+                _wasCanceled = NO;
+            }];
     }
 }
 
@@ -59,8 +57,6 @@
     _transitionContext = transitionContext;
     [self animateTransition:_transitionContext];
     [self pauseLayer:[transitionContext containerView].layer];
-    NSLog(@"boom");
-
 }
 
 - (void)updateInteractiveTransition:(CGFloat)percentComplete {
@@ -70,18 +66,16 @@
 
 - (void)cancelInteractiveTransition {
     _wasCanceled = YES;
-    CALayer *containerLayer =[_transitionContext containerView].layer;
-    CALayer *layer = containerLayer;
-
-    
-    [self resumeLayer:layer];
     [_transitionContext cancelInteractiveTransition];
+    CALayer *containerLayer =[_transitionContext containerView].layer;
+    containerLayer.speed = -1.0;
+    containerLayer.beginTime = CACurrentMediaTime();
 }
 
 - (void)finishInteractiveTransition {
     _wasCanceled = NO;
-    [self resumeLayer:[_transitionContext containerView].layer];
     [_transitionContext finishInteractiveTransition];
+    [self resumeLayer:[_transitionContext containerView].layer];
 }
 
 
@@ -97,7 +91,7 @@
             break;
         case UIGestureRecognizerStateEnded:{
             if (progress < 0.5){
-                self.completionSpeed = progress;//(1.0-progress);
+                self.completionSpeed = (1.0-progress);
                 [self cancelInteractiveTransition];
             }else{
                 self.completionSpeed = progress;

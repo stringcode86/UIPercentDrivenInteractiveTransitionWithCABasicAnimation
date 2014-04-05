@@ -22,7 +22,7 @@
 	self.navigationController.delegate = self;
     UIScreenEdgePanGestureRecognizer *pop = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
     pop.edges = UIRectEdgeLeft;
-    [self.navigationController.view addGestureRecognizer:pop];
+    [self.view addGestureRecognizer:pop];
 }
 - (void)handleGesture:(UIScreenEdgePanGestureRecognizer *)recognizer {
     self.transition.shouldBeginInteractiveTransition = YES;
@@ -33,7 +33,6 @@
 }
 
 - (void)dealloc {
-    NSLog(@"dealloc");
 }
 
 #pragma mark - Navigation controller delegate
