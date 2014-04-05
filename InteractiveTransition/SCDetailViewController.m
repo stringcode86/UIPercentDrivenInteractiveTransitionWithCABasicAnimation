@@ -44,7 +44,7 @@
 - (SCTransition *)transition {
     if (!_transition) {
         _transition = [[SCTransition alloc] init];
-        _transition.transitionDirection = kSCCardTransitionBackwards;
+        _transition.transitionDirection = kSCTransitionBackwards;
     }
     return _transition;
 }

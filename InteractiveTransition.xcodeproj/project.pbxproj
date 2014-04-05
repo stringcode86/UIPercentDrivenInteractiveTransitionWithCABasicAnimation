@@ -23,6 +23,7 @@
 		9F00111918EF025100A0AB17 /* InteractiveTransitionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F00111818EF025100A0AB17 /* InteractiveTransitionTests.m */; };
 		9F00112418EF039300A0AB17 /* SCTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F00112318EF039300A0AB17 /* SCTransition.m */; };
 		9F00112718EF057300A0AB17 /* SCDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F00112618EF057300A0AB17 /* SCDetailViewController.m */; };
+		9F00112D18F0713400A0AB17 /* SCPercentDrivenInteractiveTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F00112C18F0713400A0AB17 /* SCPercentDrivenInteractiveTransition.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,8 @@
 		9F00112318EF039300A0AB17 /* SCTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCTransition.m; sourceTree = "<group>"; };
 		9F00112518EF057300A0AB17 /* SCDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCDetailViewController.h; sourceTree = "<group>"; };
 		9F00112618EF057300A0AB17 /* SCDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCDetailViewController.m; sourceTree = "<group>"; };
+		9F00112B18F0713400A0AB17 /* SCPercentDrivenInteractiveTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCPercentDrivenInteractiveTransition.h; sourceTree = "<group>"; };
+		9F00112C18F0713400A0AB17 /* SCPercentDrivenInteractiveTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCPercentDrivenInteractiveTransition.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +130,8 @@
 				9F00112618EF057300A0AB17 /* SCDetailViewController.m */,
 				9F00112218EF039300A0AB17 /* SCTransition.h */,
 				9F00112318EF039300A0AB17 /* SCTransition.m */,
+				9F00112B18F0713400A0AB17 /* SCPercentDrivenInteractiveTransition.h */,
+				9F00112C18F0713400A0AB17 /* SCPercentDrivenInteractiveTransition.m */,
 				9F00110518EF025100A0AB17 /* Images.xcassets */,
 				9F0010F418EF025100A0AB17 /* Supporting Files */,
 			);
@@ -261,6 +266,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F0010FE18EF025100A0AB17 /* SCAppDelegate.m in Sources */,
+				9F00112D18F0713400A0AB17 /* SCPercentDrivenInteractiveTransition.m in Sources */,
 				9F00110418EF025100A0AB17 /* SCViewController.m in Sources */,
 				9F00112718EF057300A0AB17 /* SCDetailViewController.m in Sources */,
 				9F00112418EF039300A0AB17 /* SCTransition.m in Sources */,
@@ -469,6 +475,7 @@
 				9F00111E18EF025100A0AB17 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9F00111F18EF025100A0AB17 /* Build configuration list for PBXNativeTarget "InteractiveTransitionTests" */ = {
 			isa = XCConfigurationList;
@@ -477,6 +484,7 @@
 				9F00112118EF025100A0AB17 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
